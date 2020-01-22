@@ -21,6 +21,7 @@ def helpMessage() {
 
     Mandatory arguments:
       --reads                       Path to input data (must be surrounded with quotes)
+      --readPaths                   TSV file with sample_ID, fastq1 [fastq1] per each line 
       -profile                      Configuration profile to use. Can use multiple (comma separated)
                                     Available: conda, docker, singularity, awsbatch, test and more.
 
@@ -336,12 +337,14 @@ if (params.readPaths) {
     if (params.singleEnd) {
         Channel
             .from(params.readPaths)
+            .splitCsv(sep: '\t')
             .map { row -> [ row[0], [ file(row[1][0], checkIfExists: true) ] ] }
             .ifEmpty { exit 1, "params.readPaths was empty - no input files supplied" }
             .into { raw_reads_fastqc; raw_reads_trimgalore }
     } else {
         Channel
             .from(params.readPaths)
+            .splitCsv(sep: '\t')
             .map { row -> [ row[0], [ file(row[1][0], checkIfExists: true), file(row[1][1], checkIfExists: true) ] ] }
             .ifEmpty { exit 1, "params.readPaths was empty - no input files supplied" }
             .into { raw_reads_fastqc; raw_reads_trimgalore }
@@ -358,7 +361,7 @@ log.info nfcoreHeader()
 def summary = [:]
 if (workflow.revision) summary['Pipeline Release'] = workflow.revision
 summary['Run Name'] = custom_runName ?: workflow.runName
-summary['Reads'] = params.reads
+summary['Reads'] = params.reads ? params.reads : params.readPaths
 summary['Data Type'] = params.singleEnd ? 'Single-End' : 'Paired-End'
 if (params.genome) summary['Genome'] = params.genome
 if (params.pico) summary['Library Prep'] = "SMARTer Stranded Total RNA-Seq Kit - Pico Input"

@@ -12,6 +12,7 @@
 * [Main arguments](#main-arguments)
   * [`-profile`](#-profile)
   * [`--reads`](#--reads)
+  * [`--readPaths`](#--readPath)
   * [`--singleEnd`](#--singleend)
   * [Library strandedness](#library-strandedness)
 * [FeatureCounts Extra Gene Names](#featurecounts-extra-gene-names)
@@ -157,6 +158,25 @@ Please note the following requirements:
 3. When using the pipeline with paired end data, the path must use `{1,2}` notation to specify read pairs.
 
 If left unspecified, a default pattern is used: `data/*{1,2}.fastq.gz`
+
+### `--readPaths`
+
+Preferred to --reads, it points to a TSV file in which each row is a sample 
+Example of a line :
+```
+SampleID  sampleID_R1.fq.gz [sampleID_R2.fq.gz]
+```
+The number of fastq files per sample need to be in according to the experiment type
+if --singleEnd is specified, only one fastq file is considered.
+Otherwise, two files per sample are needed.
+
+Please note the following requirements:
+
+1. The file must be tab separated
+2. Each sample ID must be unique
+3. When using the pipeline with paired end data,  two fastq per sample are needed.
+
+
 
 ### `--singleEnd`
 
